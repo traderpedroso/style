@@ -98,7 +98,7 @@ def synthesize(
         raise gr.Error("Você deve inserir algum texto")
     if len(text) > 50000:
         raise gr.Error("O texto deve ter menos de 50.000 caracteres")
-    texts = txtsplit(text, desired_length=250, max_length=500)
+    texts = txtsplit(text, desired_length=250, max_length=400)
     v = voice.lower()
     audios = []
     for t in progress.tqdm(texts):
