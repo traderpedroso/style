@@ -27,7 +27,9 @@ class TextCleaner:
                 save_to_txt("ouput.txt", char)
         return indexes
     
-    def normalizer(self, text):
+    
+
+def normalizer(text):
         text = _normalize_percentages(text)
         text = _normalize_time(text)
         text = _normalize_money(text)
@@ -41,8 +43,7 @@ class TextCleaner:
         text = collapse_whitespace(text)
         text = re.sub(r"([^\.,!\?\-…])$", r"\1.", text)
         return text
-
-
+    
 def save_to_txt(file_path, content):
     try:
         # Ler o conteúdo existente do arquivo

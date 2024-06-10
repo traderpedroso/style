@@ -4,6 +4,7 @@ import styletts2importable
 import ljspeechimportable
 from openvoice import se_extractor
 from openvoice.api import ToneColorConverter
+from text_utils import normalizer
 import torch
 
 from txtsplit import txtsplit # type: ignore
@@ -27,22 +28,12 @@ theme = gr.themes.Base(
 )
 
 voicelist = [
-    "francisco",
-    "antonio",
-    "paulo",
-    "james",
-    "lucas",
-    "loucutor",
-    "bia",
-    "luna",
-    "masculino-1",
-    "masculino-2",
-    "masculino-3",
-    "masculino-4",
-    "feminino-1",
-    "feminino-2",
-    "feminino-3",
-    "feminino-4",
+    "Francisco",
+    "Antonio",
+    "Paulo",
+    "James",
+    "Lucas",
+    "Bia",
 ]
 voices = {}
 
@@ -55,7 +46,7 @@ for v in voicelist:
 if not torch.cuda.is_available():
     INTROTXT += "\n\n### Você está em um sistema Text to speech "
 
-ckpt_converter = 'checkpoints/converter'
+ckpt_converter = 'Models/OpenVoice/converter'
 device="cuda:0" if torch.cuda.is_available() else "cpu"
 output_dir = 'outputs'
 
@@ -65,7 +56,7 @@ tone_color_converter.load_ckpt(f'{ckpt_converter}/checkpoint.pth')
 os.makedirs(output_dir, exist_ok=True)
 
 
-def openvoice(wave, sr=24000, voice):
+def openvoice(wave, sr=24000, voice=None):
     sf.write(f'{output_dir}/temp.wav', wave, sr)
     base_speaker = f'{output_dir}/temp.wav'
     source_se, audio_name = se_extractor.get_se(base_speaker, tone_color_converter, vad=True)
@@ -94,17 +85,17 @@ def trim_audio(audio_np_array, sample_rate=24000, trim_ms=300):
 def synthesize(
     text, voice, multispeakersteps, alpha, beta, embscale, progress=gr.Progress()
 ):
+    text = normalizer(text)
     if text.strip() == "":
         raise gr.Error("Você deve inserir algum texto")
     if len(text) > 50000:
         raise gr.Error("O texto deve ter menos de 50.000 caracteres")
     texts = txtsplit(text, desired_length=250, max_length=400)
-    v = voice.lower()
     audios = []
     for t in progress.tqdm(texts):
         audio = styletts2importable.inference(
             t,
-            voices[v],
+            voices[voice],
             alpha=alpha,
             beta=beta,
             diffusion_steps=multispeakersteps,
@@ -119,6 +110,7 @@ def synthesize(
 
 
 def clsynthesize(text, voice, vcsteps, embscale, alpha, beta, progress=gr.Progress()):
+    text = normalizer(text)
     if text.strip() == "":
         raise gr.Error("Você deve inserir algum texto")
     if len(text) > 50000:
@@ -171,7 +163,7 @@ with gr.Blocks() as vctk:
                 voicelist,
                 label="Voz",
                 info="Selecione uma voz padrão.",
-                value="loucutor",
+                value="Francisco",
                 interactive=True,
             )
             multispeakersteps = gr.Slider(

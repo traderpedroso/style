@@ -39,8 +39,7 @@ from nltk.tokenize import word_tokenize
 from models import *
 from models import load_ASR_models, load_F0_models
 from utils import *
-from text_utils import TextCleaner
-
+from text_utils import TextCleaner, normalizer
 textclenaer = TextCleaner()
 
 
@@ -153,7 +152,7 @@ def inference(
     embedding_scale=1,
 ):
     text = text.strip()
-    text = textclenaer.normalizer(text)
+    text = normalizer(text)
     ps = global_phonemizer.phonemize([text])
     ps = word_tokenize(ps[0])
     ps = " ".join(ps)

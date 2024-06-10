@@ -115,7 +115,7 @@ model = build_model(
 _ = [model[key].eval() for key in model]
 _ = [model[key].to(device) for key in model]
 
-params_whole = torch.load("Models/LJSpeech/epoch_2nd_00100.pth", map_location="cpu")
+params_whole = torch.load("Models/LJSpeech/model.pth", map_location="cpu")
 
 params = params_whole["net"]
 
