@@ -45,7 +45,7 @@ def commit_and_push(log_dir, checkpoint_path, epoch):
     try:
         subprocess.run(["git", "config", "--global", "user.email", GIT_USER_EMAIL], check=True)
         subprocess.run(["git", "config", "--global", "user.name", GIT_USER_NAME], check=True)
-        subprocess.run(["git", "add", "/content/style" + checkpoint_path], cwd=log_dir, check=True)
+        subprocess.run(["git", "add", "/content/style/" + checkpoint_path], cwd=log_dir, check=True)
         commit_message = f"Checkpoint at epoch {epoch}"
         subprocess.run(["git", "commit", "-m", commit_message], cwd=log_dir, check=True)
         subprocess.run(["git", "push"], cwd=log_dir, check=True)

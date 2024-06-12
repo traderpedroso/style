@@ -4,3 +4,6 @@ ouput/
 .DS_Store
 *.ipynb
 __pycache__
+checkpoints/
+processed/
+outputs/

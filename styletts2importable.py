@@ -3,8 +3,8 @@ from cached_path import cached_path
 print("NLTK")
 import nltk
 
-nltk.download("punkt")
-print("SCIPY")
+# nltk.download("punkt")
+# print("SCIPY")
 from scipy.io.wavfile import write
 
 print("TORCH STUFF")

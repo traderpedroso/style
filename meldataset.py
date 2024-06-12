@@ -128,9 +128,9 @@ class FilePathDataset(torch.utils.data.Dataset):
         wave, sr = sf.read(osp.join(self.root_path, wave_path))
         if wave.shape[-1] == 2:
             wave = wave[:, 0].squeeze()
-        if sr != 24000:
-            wave = librosa.resample(wave, orig_sr=sr, target_sr=24000)
-            print(wave_path, sr)
+        # if sr != 24000:
+        #     wave = librosa.resample(wave, orig_sr=sr, target_sr=24000)
+        #     print(wave_path, sr)
 
         wave = np.concatenate([np.zeros([5000]), wave, np.zeros([5000])], axis=0)
 

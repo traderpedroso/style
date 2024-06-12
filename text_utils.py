@@ -18,8 +18,6 @@ class TextCleaner:
 
     def __call__(self, text):
         indexes = []
-        text = text.replace("(", "“")
-        text = text.replace(")", "”")
         for char in text:
             try:
                 indexes.append(self.word_index_dictionary[char])
@@ -210,23 +208,49 @@ def _normalize_time(text):
 
 
 def _normalize_money(text):
-    def money_to_words(match):
+    def money_to_words_millions(match):
         currency = match.group(1)
-        amount = int(match.group(2).replace(".", ""))
-        currency_text = {
-            "R$": "reais" if amount > 1 else "real",
-            "$": "dólares" if amount > 1 else "dólar",
-            "€": "euros",
-            "£": "libras",
-        }.get(currency, "reais")
+        integer_part = match.group(2).replace(".", "")
+        suffix = match.group(3)
+        
+        amount_text = num2words(int(integer_part), lang="pt")
+        return f"{amount_text} {suffix} de reais"
 
+    def money_to_words_cents(match):
+        currency = match.group(1)
+        integer_part = match.group(2).replace(".", "")
+        decimal_part = match.group(3)
+        
+        integer_amount_text = num2words(int(integer_part), lang="pt")
+        decimal_amount_text = num2words(int(decimal_part), lang="pt")
+        return f"{integer_amount_text} reais e {decimal_amount_text} centavos"
+    
+    def money_to_words_integers(match):
+        currency = match.group(1)
+        integer_part = match.group(2).replace(".", "")
+        
+        amount = int(integer_part)
         amount_text = num2words(amount, lang="pt")
+        
+        if amount > 1:
+            currency_text = "reais"
+        else:
+            currency_text = "real"
+        
         return f"{amount_text} {currency_text}"
+    
+    # Expressão regular para valores com milhões e bilhões
+    text = re.sub(r"(R\$|€|£|\$) (\d+)( milhões| bilhões)", money_to_words_millions, text)
+    text = re.sub(r"(R\$|€|£|\$)(\d+)( milhões| bilhões)", money_to_words_millions, text)
 
-    # Regular expressions for different currency formats
-    text = re.sub(r"(R\$|€|£|\$) (\d+[\.\d]*)", money_to_words, text)
-    text = re.sub(r"(R\$|€|£|\$)(\d+[\.\d]*)", money_to_words, text)
-    text = re.sub(r"R\$ (\d+[\.\d]*),(\d{2})", money_to_words, text)
+    # Expressão regular para valores com centavos
+    text = re.sub(r"(R\$|€|£|\$) (\d+),(\d{2})", money_to_words_cents, text)
+    text = re.sub(r"(R\$|€|£|\$)(\d+),(\d{2})", money_to_words_cents, text)
+    
+    # Expressão regular para valores inteiros
+    text = re.sub(r"(R\$|€|£|\$) (\d+)", money_to_words_integers, text)
+    text = re.sub(r"(R\$|€|£|\$)(\d+)", money_to_words_integers, text)
+    
     return text
 
 
